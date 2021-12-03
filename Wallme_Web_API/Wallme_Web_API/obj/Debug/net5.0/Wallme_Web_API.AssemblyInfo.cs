@@ -11,7 +11,6 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("aspnet-Wallme_Web_API-9F9CEF7F-2E27-4572-ACCF-5F463AD5721A")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Wallme_Web_API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]

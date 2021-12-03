@@ -1,19 +1,21 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wallme_Web_API.Data;
+using Wallme_Web_API.Data.Repositories;
+using Wallme_Web_API.Data.Repositories.IRepositories;
+using Wallme_Web_API.Models.ViewModels;
 
 namespace Wallme_Web_API
 {
@@ -29,14 +31,21 @@ namespace Wallme_Web_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
+            services.AddDbContext<Wallme_DbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("WallmeConnection"));
+                options.LogTo(Console.WriteLine);
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wallme_Web_API", Version = "v1" });
             });
+
+            services.AddAutoMapper(typeof(MappingProfile));
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +62,6 @@ namespace Wallme_Web_API
 
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
